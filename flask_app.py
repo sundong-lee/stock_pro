@@ -5,6 +5,7 @@ import datetime
 
 app = Flask(__name__, template_folder='templates')
 
+
 # Quick name -> symbol mapping for common Korean stocks to avoid unreliable remote lookups
 NAME_TO_CODE = {
     '삼성전자': '005930.KS',
@@ -13,6 +14,7 @@ NAME_TO_CODE = {
     '카카오': '035720.KS',
     '현대자동차': '005380.KS',
     '알지노믹스': '476830.KQ',
+    '셀트리온': '068270.KS',
 }
 
 
