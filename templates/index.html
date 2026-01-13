@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>간단 실시간 주식 가격 (Flask)</title>
+  <style>
+    body{ font-family: Arial, sans-serif; max-width:900px; margin:2rem auto; padding:0 1rem; }
+    h1{ margin-bottom:0.5rem }
+    #controls{ margin-bottom:1rem }
+    #controls input{ margin-right:0.5rem }
+    #prices{ width:100%; border-collapse:collapse }
+    #prices th, #prices td{ border:1px solid #ddd; padding:0.5rem; text-align:left }
+    #prices thead{ background:#f0f0f0 }
+  </style>
+</head>
+<body>
+  <h1>간단 실시간 주식 가격 (Flask)</h1>
+  <div id="controls">
+    <label>종목 (콤마로 구분, 종목명(예: 삼성전자) 또는 종목코드/심볼 입력 가능):</label>
+    <input id="tickers" placeholder="예: 삼성전자, 005930, 005930.KS" />
+    <label>갱신 간격(초):</label>
+    <input id="interval" type="number" value="5" min="1" />
+    <button id="start">시작</button>
+    <button id="stop">중단</button>
+  </div>
+
+  <table id="prices">
+    <thead><tr><th>요청</th><th>해석된 티커</th><th>종목명</th><th>가격</th><th>통화</th><th>시간(UTC)</th><th>비고</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    (function(){
+      const tickersInput = document.getElementById('tickers');
+      const intervalInput = document.getElementById('interval');
+      const startBtn = document.getElementById('start');
+      const stopBtn = document.getElementById('stop');
+      const tbody = document.querySelector('#prices tbody');
+      let timer = null;
+
+      function updateTable(prices, ts){
+        tbody.innerHTML = '';
+        Object.keys(prices).forEach(req => {
+          const p = prices[req] || {};
+          const tr = document.createElement('tr');
+          const tdReq = document.createElement('td'); tdReq.textContent = req;
+          const tdResolved = document.createElement('td'); tdResolved.textContent = p.resolved || '-';
+          const tdName = document.createElement('td'); tdName.textContent = p.name || '-';
+          const tdPrice = document.createElement('td'); tdPrice.textContent = p.price == null ? '-' : Number(p.price).toFixed(2);
+          const tdCurrency = document.createElement('td'); tdCurrency.textContent = p.currency || 'KRW';
+          const tdTs = document.createElement('td'); tdTs.textContent = ts;
+          const tdNote = document.createElement('td'); tdNote.textContent = p.error || '';
+          tr.appendChild(tdReq); tr.appendChild(tdResolved); tr.appendChild(tdName); tr.appendChild(tdPrice); tr.appendChild(tdCurrency); tr.appendChild(tdTs); tr.appendChild(tdNote);
+          tbody.appendChild(tr);
+        });
+      }
+
+      async function fetchPrices(){
+        const tickers = tickersInput.value.split(',').map(s=>s.trim().toUpperCase()).filter(s=>s);
+        if(!tickers.length) return;
+        const q = '?tickers=' + encodeURIComponent(tickers.join(','));
+        try{
+          const res = await fetch('/prices' + q);
+          const data = await res.json();
+          updateTable(data.prices || {}, data.ts || '');
+        }catch(e){ console.error(e); }
+      }
+
+      startBtn.addEventListener('click', ()=>{
+        const interval = Math.max(1, parseInt(intervalInput.value) || 5) * 1000;
+        if(timer) clearInterval(timer);
+        fetchPrices();
+        timer = setInterval(fetchPrices, interval);
+      });
+
+      stopBtn.addEventListener('click', ()=>{
+        if(timer) clearInterval(timer); timer = null; tbody.innerHTML = '';
+      });
+    })();
+  </script>
+</body>
+</html>

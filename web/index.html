@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>실시간 주식 가격</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <h1>실시간 주식 가격 🔔</h1>
+  <div id="controls">
+    <label>종목 (콤마로 구분):</label>
+    <input id="tickers" placeholder="AAPL,TSLA,MSFT" />
+    <label>갱신 간격(초):</label>
+    <input id="interval" type="number" value="5" min="1" />
+    <button id="subscribe">구독 시작</button>
+    <button id="unsubscribe">구독 중단</button>
+  </div>
+
+  <table id="prices">
+    <thead><tr><th>종목</th><th>가격(USD)</th><th>시간(UTC)</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

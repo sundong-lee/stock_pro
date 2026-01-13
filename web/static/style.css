@@ -1,0 +1,7 @@
+body{ font-family: Arial, sans-serif; max-width:900px; margin:2rem auto; padding:0 1rem; }
+h1{ margin-bottom:0.5rem }
+#controls{ margin-bottom:1rem }
+#controls input{ margin-right:0.5rem }
+#prices{ width:100%; border-collapse:collapse }
+#prices th, #prices td{ border:1px solid #ddd; padding:0.5rem; text-align:left }
+#prices thead{ background:#f0f0f0 }
